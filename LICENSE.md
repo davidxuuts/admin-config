@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2022 davidxuuts
+Copyright (c) 2022 [David XU](https://github.com/davidxuuts)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

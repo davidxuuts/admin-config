@@ -1,0 +1,41 @@
+{
+    "name": "davidxu/yii2-admin",
+    "description": "This is a common library with set of foundation classes and components used by Yii2-AIO extensions by David Xu.",
+    "type": "yii2-extension",
+    "license": "MIT",
+    "keywords": [
+        "yii2 extension",
+        "common library",
+        "yii2"
+    ],
+    "authors": [
+        {
+            "name": "David Xu",
+            "email": "david.xu.uts@163.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.4",
+        "davidxu/yii2-adminlte3-asset": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
+    "repositories":[
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "davidxu\\config\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        }
+    }
+}
