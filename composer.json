@@ -1,5 +1,5 @@
 {
-    "name": "davidxu/yii2-admin",
+    "name": "davidxu/yii2-admin-config",
     "description": "This is a common library with set of foundation classes and components used by Yii2-AIO extensions by David Xu.",
     "type": "yii2-extension",
     "license": "MIT",
