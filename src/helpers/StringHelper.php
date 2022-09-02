@@ -84,4 +84,28 @@ class StringHelper extends YiiStringHelper
         }
         return is_string($uuid) ? $uuid : $uuid->toString();
     }
+
+    /**
+     * Parase Enum attributes
+     *
+     * Input format a:des1,b:des2
+     *
+     * @param $string
+     * @return array
+     */
+    public static function parseEnumAttr($string)
+    {
+        $array = preg_split('/[,;\r\n]+/', trim($string, ",;\r\n"));
+        if (strpos($string, ':')) {
+            $value = [];
+            foreach ($array as $val) {
+                list($k, $v) = explode(':', $val);
+                $value[$k] = $v;
+            }
+        } else {
+            $value = $array;
+        }
+
+        return $value;
+    }
 }
