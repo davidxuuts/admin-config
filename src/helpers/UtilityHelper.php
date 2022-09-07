@@ -17,7 +17,7 @@ class UtilityHelper
     {
         $attachments = [];
         if (ArrayHelper::isIn($row['type'], ConfigTypeEnum::hasAttachment())) {
-            if ($row['value']['data']) {
+            if (isset($row['value']) && isset($row['value']['data'])) {
                 $value = $row['value']['data'];
                 if (is_string($value)) {
                     $value = explode(',', $value);
