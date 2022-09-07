@@ -5,7 +5,7 @@ namespace davidxu\config\helpers;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
-use davidxu\config\enums\AppIdEnum;
+use davidxu\base\enums\AppIdEnum;
 
 /**
  * Response result helper
@@ -26,7 +26,8 @@ class ResponseHelper
         if (!$message) {
             $message = Yii::t('app', 'Unknown error');
         }
-        if (in_array(Yii::$app->id, AppIdEnum::api(), true)) {
+        $appId = Yii::$app->params['appId'] ?? Yii::$app->id;
+        if (in_array($appId, AppIdEnum::api(), true)) {
             return static::api($code, $message, $data);
         }
         return static::baseJson($code, $message, $data);

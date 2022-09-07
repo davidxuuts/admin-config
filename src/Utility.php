@@ -2,7 +2,7 @@
 
 namespace davidxu\config;
 
-use davidxu\config\enums\AppIdEnum;
+use davidxu\base\enums\AppIdEnum;
 use Yii;
 use yii\web\UnprocessableEntityHttpException;
 
@@ -119,11 +119,11 @@ class Utility
      * Get configuration by app_id
      *
      * @param bool $noCache false:Read from cache otherwise false
-     * @param int $app_id AppID from AppIdEnum
+     * @param string $app_id AppID from AppIdEnum
      * @param int $merchant_id Merchant ID
      * @return array|mixed
      */
-    protected function getConfigInfo(bool $noCache, int $app_id, int $merchant_id = 0)
+    protected function getConfigInfo(bool $noCache, string $app_id, int $merchant_id = 0)
     {
         $cacheKey = 'config:' . $merchant_id . $app_id;
         if (!$noCache && !empty($this->config[$cacheKey])) {
