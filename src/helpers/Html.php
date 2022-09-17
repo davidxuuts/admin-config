@@ -64,7 +64,7 @@ class Html extends BaseHtml
     {
         $options = ArrayHelper::merge([
             'data-message' => Yii::t('configtr', 'Only number allowed for display order'),
-            'class' => 'form-control form-control-sm',
+            'class' => 'form-control form-control-sm sort-input',
             'onblur' => 'editOrder(this)',
         ], $options);
 

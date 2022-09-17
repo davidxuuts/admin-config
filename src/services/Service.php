@@ -99,5 +99,13 @@ class Service extends Component
                 '*' => 'configtr.php',
             ],
         ];
+        $i18n->translations['base*'] = [
+            'class' => PhpMessageSource::class,
+            'sourceLanguage' => 'en-US',
+            'basePath' => '@davidxu/base/messages',
+            'fileMap' => [
+                '*' => 'base.php',
+            ],
+        ];
     }
 }

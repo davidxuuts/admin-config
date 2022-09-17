@@ -55,7 +55,7 @@ class Config extends BaseModel
     public function rules()
     {
         return [
-            [['name', 'type', 'title'], 'required'],
+            [['name', 'type', 'title', 'cate_id'], 'required'],
             [['cate_id', 'is_hide_remark', 'sort', 'status'], 'integer'],
             [['status'], 'in', 'range' => StatusEnum::getKeys()],
             [['status'], 'default', 'value' => StatusEnum::ENABLED],
