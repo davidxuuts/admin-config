@@ -3,9 +3,9 @@
 namespace davidxu\config\services\merchant;
 
 use davidxu\config\services\Service;
-use common\enums\MerchantStatusEnum;
+use davidxu\base\enums\MerchantStatusEnum;
 use davidxu\base\enums\StatusEnum;
-use common\models\merchant\Merchant;
+use davidxu\config\models\merchant\Merchant;
 use yii\db\ActiveRecord;
 
 /**

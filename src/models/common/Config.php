@@ -2,7 +2,7 @@
 
 namespace davidxu\config\models\common;
 
-use common\models\common\Attachment;
+use davidxu\base\models\Attachment;
 use davidxu\base\enums\AppIdEnum;
 use davidxu\base\enums\StatusEnum;
 use davidxu\base\enums\ConfigTypeEnum;

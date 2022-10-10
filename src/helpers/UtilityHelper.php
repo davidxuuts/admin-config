@@ -2,7 +2,7 @@
 
 namespace davidxu\config\helpers;
 
-use davidxu\dropzone\models\Attachment;
+use davidxu\base\models\Attachment;
 use davidxu\base\enums\ConfigTypeEnum;
 use yii\db\ActiveRecord;
 

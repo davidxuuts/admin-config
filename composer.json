@@ -19,7 +19,6 @@
         "php": ">=8.0",
         "davidxu/yii2-base": "^1.0.1",
         "davidxu/yii2-adminlte3-asset": "^1.0",
-        "davidxu/yii2-sweetalert2-widget": "^2.0",
         "mdmsoft/yii2-admin": "~2.0",
         "sam-it/yii2-mariadb": "^3.1",
         "ramsey/uuid": "^4.0",

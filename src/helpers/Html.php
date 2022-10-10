@@ -3,7 +3,7 @@
 namespace davidxu\config\helpers;
 
 use davidxu\base\enums\StatusEnum;
-use davidxu\sweetalert2\SweetAlert2;
+use davidxu\base\SweetAlert2;
 use yii\bootstrap4\BaseHtml;
 use Yii;
 use yii\web\JsExpression;
