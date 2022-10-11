@@ -39,6 +39,8 @@ class UtilityHelper
                         'name' => $attachment->name,
                         'path' => $attachment->path,
                         'size' => $attachment->size,
+                        'file_type' => $attachment->file_type,
+                        'poster' => $attachment->poster ?? '/images/default-video.jpg',
                     ];
                     $attachments[] = $attach;
                 }

@@ -127,6 +127,8 @@ class Config extends BaseModel
                     $attachments[]['name'] = $attachment->name;
                     $attachments[]['path'] = $attachment->path;
                     $attachments[]['size'] = $attachment->size;
+                    $attachments[]['file_type'] = $attachment->file_type;
+                    $attachments[]['poster'] = $attachment->poster ?? '/images/default-video.jpg';
                 }
             }
         }
