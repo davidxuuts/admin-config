@@ -16,7 +16,7 @@ class MemberService extends Service
      * @param Member $member
      * @return void
      */
-    public function lastLogin(Member $member)
+    public function lastLogin($member)
     {
         ++$member->visit_count;
         $member->last_time = time();
