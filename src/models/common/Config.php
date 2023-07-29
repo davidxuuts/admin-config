@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 namespace davidxu\config\models\common;
 
@@ -9,6 +14,7 @@ use davidxu\base\enums\ConfigTypeEnum;
 use davidxu\config\helpers\ArrayHelper;
 use davidxu\config\models\base\BaseModel;
 use Yii;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "{{%common_config}}".
@@ -16,14 +22,14 @@ use Yii;
  * @property int $id ID
  * @property string $title Title
  * @property string $name Unique name in system
- * @property string $app_id App ID
+ * @property string|int $app_id App ID
  * @property string $type Config type in Enums
  * @property int $cate_id Config category
  * @property string|null $extra Config value parameters
  * @property string|null $remark Remark
  * @property int|null $is_hide_remark Is hide remark
  * @property string|null $default_value Default config value if not set
- * @property int|null $sort Display order
+ * @property int|null $order Display order
  * @property int|null $status Status[-1:Deleted;0:Disabled;1:Enabled]
  * @property int|null $created_at Created at
  * @property int|null $updated_at Updated at
@@ -37,12 +43,12 @@ class Config extends BaseModel
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%common_config}}';
     }
 
-    public function fields()
+    public function fields(): array
     {
         $fields = parent::fields();
         $fields['attachments'] = $this->attachments;
@@ -52,25 +58,31 @@ class Config extends BaseModel
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            [['name', 'type', 'title', 'cate_id'], 'required'],
-            [['cate_id', 'is_hide_remark', 'sort', 'status'], 'integer'],
-            [['status'], 'in', 'range' => StatusEnum::getKeys()],
+            [['name', 'type', 'title', 'cate_id', 'app_id'], 'required'],
+            [['cate_id', 'is_hide_remark', 'order', 'status'], 'integer'],
+            [['status'], 'in', 'range' => StatusEnum::getBoolKeys()],
             [['status'], 'default', 'value' => StatusEnum::ENABLED],
             [['title', 'name'], 'string', 'max' => 50],
             [['app_id'], 'string', 'max' => 20],
             [['app_id'], 'in', 'range' => AppIdEnum::getKeys()],
             [['type'], 'in', 'range' => ConfigTypeEnum::getKeys()],
             [['extra', 'remark', 'default_value'], 'string', 'max' => 1000],
+            [['name', 'app_id'], 'unique', 'targetAttribute' => ['name', 'app_id']],
+            [
+                ['cate_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => ConfigCate::class,
+                'targetAttribute' => ['cate_id' => 'id']
+            ],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => Yii::t('configtr', 'ID'),
@@ -83,22 +95,27 @@ class Config extends BaseModel
             'remark' => Yii::t('configtr', 'Remark'),
             'is_hide_remark' => Yii::t('configtr', 'Hide remark'),
             'default_value' => Yii::t('configtr', 'Default value'),
-            'sort' => Yii::t('configtr', 'Display order'),
+            'order' => Yii::t('configtr', 'Display order'),
             'status' => Yii::t('configtr', 'Status'),
             'created_at' => Yii::t('configtr', 'Created at'),
             'updated_at' => Yii::t('configtr', 'Updated at'),
         ];
     }
 
-    public function getCate()
+    /**
+     * Gets query for [[Cate]]
+     * @return ActiveQuery
+     */
+    public function getCate(): ActiveQuery
     {
         return $this->hasOne(ConfigCate::class, ['id' => 'cate_id']);
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * Gets query for [[Value]]
+     * @return ActiveQuery
      */
-    public function getValue()
+    public function getValue(): ActiveQuery
     {
         return $this->hasOne(ConfigValue::class, ['config_id' => 'id']);
     }
@@ -106,10 +123,11 @@ class Config extends BaseModel
     /**
      * @return array
      */
-    public function getAttachments()
+    public function getAttachments(): array
     {
         $attachments = [];
         if (ArrayHelper::isIn($this->type, ConfigTypeEnum::hasAttachment())) {
+            $allAttachments = null;
             if ($this->value) {
                 if (is_string($this->value)) {
                     $value = explode(',', $this->value);

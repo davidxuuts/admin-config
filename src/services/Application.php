@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 namespace davidxu\config\services;
 
@@ -10,18 +15,18 @@ use davidxu\config\services\common\ConfigService;
 /**
  * Class Service Application
  * @package davidxu\config\services
- * @property BackendMemberService $backendMember
- * @property MerchantService $merchant
- * @property ConfigService $config
- * @property ConfigCateService $configCate
+ * @property BackendMemberService $backendMemberService
+ * @property MerchantService $merchantService
+ * @property ConfigService $configService
+ * @property ConfigCateService $configCateService
  */
 class Application extends Service
 {
     /** @var array $childService */
     public array $childService = [
-        'backendMember' => BackendMemberService::class,
-        'merchant' => MerchantService::class,
-        'config' => ConfigService::class,
-        'configCate' => ConfigCateService::class,
+        'backendMemberService' => BackendMemberService::class,
+        'merchantService' => MerchantService::class,
+        'configService' => ConfigService::class,
+        'configCateService' => ConfigCateService::class,
     ];
 }

@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 namespace davidxu\config\services\merchant;
 
@@ -13,69 +18,50 @@ use yii\db\ActiveRecord;
  * Class MerchantService
  * @package davidxu\config\services\merchant
  *
- * @property int $merchant_id Merchant ID
+ * @property int|null $merchant_id Merchant ID
  */
 class MerchantService extends Service
 {
-    /**
-     * @var int
-     */
-    protected $merchant_id = 1;
+    /** @var int|null  */
+    protected ?int $merchant_id = null;
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->merchant_id;
     }
 
     /**
-     * @param int $merchant_id
+     * @param int|null $merchant_id
      */
-    public function setId(int $merchant_id)
+    public function setId(?int $merchant_id)
     {
         $this->merchant_id = $merchant_id;
     }
 
     /**
-     * @return int
+     * @param int|null $merchant_id
+     * @return int|string|null
      */
-    public function getNotNullId(): int
-    {
-        return !empty($this->merchant_id) ? (int)$this->merchant_id : 0;
-    }
-
-    /**
-     * @param int $merchant_id
-     */
-    public function addId(int $merchant_id)
-    {
-        !$this->merchant_id && $this->merchant_id = $merchant_id;
-    }
-
-    /**
-     * @param int $merchant_id
-     * @return mixed
-     */
-    public function getCount(int $merchant_id = 1)
+    public function getCount(?int $merchant_id = null): int|string|null
     {
         return Merchant::find()
             ->select('id')
-            ->where(['>=', 'status', StatusEnum::DISABLED])
-            ->andWhere(['state' => StatusEnum::ENABLED])
+            ->where(['state' => StatusEnum::ENABLED])
             ->andFilterWhere(['id' => $merchant_id])
             ->count();
     }
 
     /**
-     * @return int|string
+     * @param int|null $merchant_id
+     * @return int|string|null
      */
-    public function getApplyCount($merchant_id = '')
+    public function getApplyCount(?int $merchant_id = null): int|string|null
     {
         return Merchant::find()
             ->select('id')
-            ->where(['>=', 'status', StatusEnum::DISABLED])
             ->andWhere(['in', 'state', [MerchantStatusEnum::AUDIT]])
             ->andFilterWhere(['id' => $merchant_id])
             ->count();
@@ -84,26 +70,28 @@ class MerchantService extends Service
     /**
      * @return array|ActiveRecord|null
      */
-    public function findByLogin()
+    public function findByLogin(): array|ActiveRecord|null
     {
         return $this->findById($this->getId());
     }
 
     /**
+     * @param int|string|null $id
      * @return array|ActiveRecord|null
      */
-    public function findById($id)
+    public function findById(int|string|null $id): array|ActiveRecord|null
     {
         return Merchant::find()
-            ->where(['>=', 'status', StatusEnum::DISABLED])
+            ->where(['status' => StatusEnum::DISABLED])
             ->andWhere(['id' => $id])
             ->one();
     }
 
     /**
+     * @param string|int $id
      * @return array|ActiveRecord|null
      */
-    public function findBaseById($id)
+    public function findBaseById(string|int $id): array|ActiveRecord|null
     {
         return Merchant::find()
             ->select([
@@ -122,9 +110,10 @@ class MerchantService extends Service
     }
 
     /**
-     * @return array|ActiveRecord|null
+     * @param array $ids
+     * @return array
      */
-    public function findBaseByIds($ids)
+    public function findBaseByIds(array $ids): array
     {
         return Merchant::find()
             ->select([
@@ -143,9 +132,9 @@ class MerchantService extends Service
     }
 
     /**
-     * @return array|ActiveRecord|null
+     * @return array
      */
-    public function findBaseAll()
+    public function findBaseAll(): array
     {
         return Merchant::find()
             ->select([

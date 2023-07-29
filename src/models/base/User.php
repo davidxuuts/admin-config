@@ -1,11 +1,17 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 namespace davidxu\config\models\base;
 
 use Yii;
 use yii\base\Exception;
 use yii\base\NotSupportedException;
-use yii\web\IdentityInterface;
+use yii\web\IdentityInterface as IdentityInterface;
+
 /**
  * User model
  *

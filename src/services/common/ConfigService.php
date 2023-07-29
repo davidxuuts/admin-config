@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 namespace davidxu\config\services\common;
 
@@ -7,9 +12,10 @@ use davidxu\base\enums\StatusEnum;
 use davidxu\config\models\common\Config;
 use davidxu\config\models\common\ConfigValue;
 use davidxu\config\services\Service;
+use Exception;
+use Throwable;
 use Yii;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\helpers\Json;
 
 /**
@@ -22,71 +28,65 @@ class ConfigService extends Service
      * Batch update
      *
      * @param string $app_id
-     * @param array $data
+     * @param array|null $data
+     * @return bool
      */
-    public function updateAll(string $app_id, array $data)
+    public function updateAll(string $app_id, array|null $data): bool
     {
-        $merchant_id = isset(Yii::$app->services->merchant) ? Yii::$app->services->merchant->getNotNullId() : 0;
+        $merchant_id = isset(Yii::$app->services->merchantService)
+            ? Yii::$app->services->merchantService->getId()
+            : null;
 
-        $query = Config::find();
+        $query = Config::find()
+            ->where(['in', 'name', array_keys($data)])
+            ->andWhere(['app_id' => $app_id]);
         $model = new Config();
-        $configs = $query->where(['in', 'name', array_keys($data)])
-            ->andWhere(['app_id' => $app_id])
-            ->with([
-                'value' => function (ActiveQuery $subQuery) use ($merchant_id, $app_id, $model) {
-                    $subQuery->andWhere(['app_id' => $app_id]);
-                    if ($model->hasAttribute('merchant_id')) {
-                        $subQuery->andFilterWhere(['merchant_id' => $merchant_id]);
-                    }
-                    return $subQuery;
-                }
-            ])
-            ->all();
-
-        /** @var Config $item */
-//        $result = true;
-//        $transaction = Yii::$app->getDb()->beginTransaction();
-//        try {
-            foreach ($configs as $item) {
-                $val = $data[$item['name']] ?? '';
-                /** @var ConfigValue $model */
-                $model = $item->value ?? new ConfigValue();
-                $model->merchant_id = $merchant_id;
-                $model->config_id = $item->id;
-                $model->app_id = $item->app_id;
-                $model->data = is_array($val) ? Json::encode($val) : $val;
-                $model->save();
+        if ($model->hasAttribute('merchant_id')) {
+            $query->andWhere(['merchant_id' => $merchant_id]);
+        }
+        $configs = $query->all();
+        /** @var Config $config */
+        $transaction = Yii::$app->getDb()->beginTransaction();
+        try {
+            $configIds = $records = [];
+            $fields = ['merchant_id', 'app_id', 'config_id', 'data'];
+            foreach ($configs as $config) {
+                $configIds[] = $config->id;
+                $val = $data[$config->name] ?? null;
+                $configData = is_array($val) ? Json::encode($val) : $val;
+                $records[] = [$merchant_id, $config->app_id, $config->id, $configData];
             }
+            ConfigValue::deleteAll(['config_id' => $configIds]);
+            Yii::$app->db->createCommand()
+                ->batchInsert(ConfigValue::tableName(), $fields, $records)
+                ->execute();
 
             if ($app_id === AppIdEnum::BACKEND) {
                 Yii::$app->utility->backendConfigAll(true);
             } else {
                 Yii::$app->utility->merchantConfigAll(true, $merchant_id);
             }
-//            $transaction->commit();
-//        } catch(\Exception $e) {
-//            $transaction->rollBack();
-//            return $result;
-//        } catch(\Throwable $e) {
-//            $transaction->rollBack();
-//            return $result;
-//        }
-//        return $result;
+            $transaction->commit();
+            return true;
+        } catch(Exception|Throwable) {
+            $transaction->rollBack();
+            return false;
+        }
     }
 
     /**
      * @param string $app_id App ID
-     * @param int $merchant_id Merchant ID
+     * @param ?int $merchant_id Merchant ID
      * @return array
      */
-    public function findAllWithValue(string $app_id, int $merchant_id): array
+    public function findAllWithValue(string $app_id, ?int $merchant_id = null): array
     {
-        $model = new Config();
         return Config::find()
             ->where(['status' => StatusEnum::ENABLED])
             ->andWhere(['app_id' => $app_id])
             ->with([
-                'value' => function (ActiveQuery $subQuery) use ($merchant_id, $app_id, $model) {
+                'value' => function (ActiveQuery $subQuery) use ($merchant_id, $app_id) {
+                    $model = new Config();
                     $subQuery->andWhere(['app_id' => $app_id]);
                     if ($model->hasAttribute('merchant_id')) {
                         $subQuery->andFilterWhere(['merchant_id' => $merchant_id]);

@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
+
 namespace davidxu\config\helpers;
 
 use Exception;
@@ -58,30 +64,37 @@ class StringHelper extends YiiStringHelper
      * @return string
      * @throws Exception
      */
-    protected static function uuid($type = '', $name = 'php.net'): string
+    protected static function uuid(string $type = '', string $name = 'php.net'): string
     {
-        switch ($type) {
-            // represents a version 1 UUID
-            case 'time' :
-                $uuid = Uuid::uuid1();
-                break;
-            // Returns a version 3 (name-based) UUID based on the MD5 hash of a namespace ID and a name
-            case 'md5' :
-                $uuid = Uuid::uuid3(Uuid::NAMESPACE_DNS, $name);
-                break;
-            // Returns a version 4 (random) UUID
-            case 'random' :
-                $uuid = Uuid::uuid4();
-
-                break;
-            // Returns a version 5 (name-based) UUID based on the SHA-1 hash of a namespace ID and a name
-            case 'sha1' :
-                $uuid = Uuid::uuid5(Uuid::NAMESPACE_DNS, $name);
-                break;
-            // php uuid
-            default :
-                $uuid = md5(uniqid(md5(microtime(true) . random_bytes(8)), true));
-        }
+        $uuid = match ($type) {
+            'time' => Uuid::uuid1(),
+            'md5' => Uuid::uuid3(Uuid::NAMESPACE_DNS, $name),
+            'random' => Uuid::uuid4(),
+            'sha1' => Uuid::uuid5(Uuid::NAMESPACE_DNS, $name),
+            default => md5(uniqid(md5(microtime(true) . random_bytes(8)), true)),
+        };
+//        switch ($type) {
+//            // represents a version 1 UUID
+//            case 'time' :
+//                $uuid = Uuid::uuid1();
+//                break;
+//            // Returns a version 3 (name-based) UUID based on the MD5 hash of a namespace ID and a name
+//            case 'md5' :
+//                $uuid = Uuid::uuid3(Uuid::NAMESPACE_DNS, $name);
+//                break;
+//            // Returns a version 4 (random) UUID
+//            case 'random' :
+//                $uuid = Uuid::uuid4();
+//
+//                break;
+//            // Returns a version 5 (name-based) UUID based on the SHA-1 hash of a namespace ID and a name
+//            case 'sha1' :
+//                $uuid = Uuid::uuid5(Uuid::NAMESPACE_DNS, $name);
+//                break;
+//            // php uuid
+//            default :
+//                $uuid = md5(uniqid(md5(microtime(true) . random_bytes(8)), true));
+//        }
         return is_string($uuid) ? $uuid : $uuid->toString();
     }
 
@@ -90,10 +103,10 @@ class StringHelper extends YiiStringHelper
      *
      * Input format a:des1,b:des2
      *
-     * @param $string
+     * @param string $string
      * @return array
      */
-    public static function parseEnumAttr($string)
+    public static function parseEnumAttr(string $string): array
     {
         $array = preg_split('/[,;\r\n]+/', trim($string, ",;\r\n"));
         if (strpos($string, ':')) {

@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 namespace davidxu\config\services;
 
@@ -25,8 +30,8 @@ class Service extends Component
      */
     protected array $_childService;
 
-    /** @var int $merchant_id */
-    protected $merchant_id;
+    /** @var int|null $merchant_id */
+    protected ?int $merchant_id = null;
 
     /**
      * @inheritDoc
@@ -50,19 +55,17 @@ class Service extends Component
     /**
      * Get Merchant ID
      *
-     * @return int
+     * @return int|null
      */
-    public function getMerchantId()
+    public function getMerchantId(): ?int
     {
         if (!$this->merchant_id) {
-            $this->merchant_id = Yii::$app->services->merchant->getId();
+            $this->merchant_id = Yii::$app->services->merchantService->getId();
         }
         $appId = Yii::$app->params['appId'] ?? Yii::$app->id;
-
         if (in_array($appId, [AppIdEnum::CONSOLE, AppIdEnum::BACKEND])) {
-            return 0;
+            return null;
         }
-
         return $this->merchant_id;
     }
 

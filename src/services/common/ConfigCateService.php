@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 namespace davidxu\config\services\common;
 
@@ -8,6 +13,7 @@ use yii\db\ActiveQuery;
 use davidxu\config\models\common\ConfigCate;
 use davidxu\config\helpers\ArrayHelper;
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * Class ConfigCateService
@@ -16,9 +22,10 @@ use Yii;
 class ConfigCateService extends Service
 {
     /**
+     * @param int|string $app_id
      * @return array
      */
-    public function getDropDown($app_id)
+    public function getDropDown(int|string $app_id): array
     {
         $models = ArrayHelper::itemsMerge($this->findAll($app_id));
 
@@ -28,47 +35,48 @@ class ConfigCateService extends Service
     /**
      * Get dropdown list for categories
      *
-     * @param string $app_id
+     * @param int|string $app_id
      * @param int|null $id
      * @return array
      */
-    public function getDropDownForEdit(string $app_id, ?int $id = null)
+    public function getDropDownForEdit(int|string $app_id, ?int $id = null)
     {
         $list = ConfigCate::find()
             ->where(['>=', 'status', StatusEnum::DISABLED])
             ->andWhere(['app_id' => $app_id])
             ->andFilterWhere(['<>', 'id', $id])
             ->select(['id', 'title', 'pid', 'level'])
-            ->orderBy(['sort' => SORT_ASC])
+            ->orderBy(['order' => SORT_ASC])
             ->asArray()
             ->all();
 
         $models = ArrayHelper::itemsMerge($list);
         $data = ArrayHelper::map(ArrayHelper::itemsMergeDropDown($models), 'id', 'title');
 
-        return ArrayHelper::merge([0 => Yii::t('configtr', 'Top category')], $data);
+        return ArrayHelper::merge([null => Yii::t('configtr', 'Top category')], $data);
     }
 
     /**
      * 获取关联配置信息的递归数组
      *
-     * @param $app_id
+     * @param int|string $app_id
      * @return array
      */
-    public function getItemsMergeForConfig($app_id)
+    public function getItemsMergeForConfig(int|string $app_id): array
     {
         return ArrayHelper::itemsMerge($this->findAllWithConfig($app_id));
     }
 
     /**
-     * @param $cate_id
+     * @param int|string $app_id
+     * @param int|string $cate_id
      * @return array
      */
-    public function getChildIds($app_id, $cate_id)
+    public function getChildIds(int|string $app_id, int|string $cate_id): array
     {
-        $cates = $this->findAll($app_id);
-        $cateIds = ArrayHelper::getChildIds($cates, $cate_id);
-        array_push($cateIds, $cate_id);
+        $categories = $this->findAll($app_id);
+        $cateIds = ArrayHelper::getChildIds($categories, $cate_id);
+        $cateIds[] = $cate_id;
 
         return $cateIds;
     }
@@ -76,14 +84,15 @@ class ConfigCateService extends Service
     /**
      * 关联配置的列表
      *
-     * @return array|\yii\db\ActiveRecord[]
+     * @param int|string $app_id
+     * @return array|ActiveRecord[]
      */
-    public function findAllWithConfig($app_id)
+    public function findAllWithConfig(int|string $app_id): array
     {
         return ConfigCate::find()
             ->where(['status' => StatusEnum::ENABLED])
             ->andWhere(['app_id' => $app_id])
-            ->orderBy(['sort' => SORT_ASC])
+            ->orderBy(['order' => SORT_ASC])
             ->with([
                 'config' => function (ActiveQuery $query) use ($app_id) {
                     return $query->andWhere(['app_id' => $app_id])
@@ -99,9 +108,10 @@ class ConfigCateService extends Service
     }
 
     /**
-     * @return array|\yii\db\ActiveRecord[]
+     * @param int|string $app_id
+     * @return array|ActiveRecord[]
      */
-    public function findAll($app_id)
+    public function findAll(int|string $app_id): array
     {
         return ConfigCate::find()
             ->where(['status' => StatusEnum::ENABLED])

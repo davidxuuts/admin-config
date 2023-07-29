@@ -1,13 +1,18 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 namespace davidxu\config\models\backend;
 
 use davidxu\base\enums\GenderEnum;
 use davidxu\base\enums\StatusEnum;
 use davidxu\config\models\base\User;
+use davidxu\srbac\models\Assignment;
 use Yii;
 use yii\base\Exception;
-//use common\models\rbac\AuthAssignment;
 
 /**
  * This is the model class for table "{{%backend_member}}".
@@ -39,6 +44,9 @@ use yii\base\Exception;
  * @property int $status Status[-1:Deleted;0:Disabled;1:Enabled]
  * @property int $created_at Created at
  * @property int $updated_at Updated at
+ *
+ * @property-read Assignment[] $roles Roles
+ * @property-read array $rolesName Roles name list
  *
  */
 class Member extends User
@@ -133,11 +141,51 @@ class Member extends User
     }
 
     /**
-     * @return bool
+     * @param string $name
+     * @return Member|null
      */
+    public function getName(string $name): ?Member
+    {
+        return static::findOne(['and', ['or',
+            [
+                'username' => $name,
+            ], [
+                'realname' => $name
+            ]],
+            ['status' => self::STATUS_ACTIVE]
+        ]);
+    }
+
+//    /**
+//     * @return bool
+//     */
 //    public function beforeDelete(): bool
 //    {
 //        AuthAssignment::deleteAll(['user_id' => $this->id, 'app_id' => AppEnum::BACKEND]);
 //        return parent::beforeDelete();
+//    }
+
+//    /**
+//     * @return \yii\db\ActiveQuery
+//     */
+//    public function getRoles()
+//    {
+//        return $this->hasMany(AuthAssignment::class, [
+//            'user_id' => 'id',
+//        ]);
+//    }
+//
+//    /**
+//     * @return array
+//     */
+//    public function getRolesName()
+//    {
+//        $items = [];
+//        if ($roles = $this->getRoles()->all()) {
+//            foreach ($roles as $role) {
+//                $items[] = $role->item_name;
+//            }
+//        }
+//        return $items;
 //    }
 }

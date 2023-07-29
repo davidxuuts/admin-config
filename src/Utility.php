@@ -1,8 +1,15 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 namespace davidxu\config;
 
 use davidxu\base\enums\AppIdEnum;
+use EasyWeChat\Kernel\Exceptions\HttpException;
+use Exception;
 use Yii;
 use yii\web\UnprocessableEntityHttpException;
 
@@ -22,12 +29,12 @@ class Utility
      *
      * @param string $name Field name
      * @param bool $noCache false:Read from cache otherwise false
-     * @param int $merchant_id Merchant ID for multiple merchants
+     * @param ?int $merchant_id Merchant ID for multiple merchants
      * @return string|null
      */
-    public function config(string $name, bool $noCache = false, int $merchant_id = 0)
+    public function config(string $name, bool $noCache = false, int $merchant_id = null): ?string
     {
-        !$merchant_id && $merchant_id = Yii::$app->services->merchant->getId();
+        !$merchant_id && $merchant_id = Yii::$app->services->merchantService->getId();
         $app_id = !$merchant_id ? AppIdEnum::BACKEND : AppIdEnum::MERCHANT;
 
         // 获取缓存信息
@@ -40,12 +47,12 @@ class Utility
      * Return all configuration
      *
      * @param bool $noCache false:Read from cache otherwise false
-     * @param int $merchant_id Merchant ID
+     * @param ?int $merchant_id Merchant ID
      * @return array|mixed
      */
-    public function configAll($noCache = false, int $merchant_id = 0)
+    public function configAll(bool $noCache = false, int $merchant_id = null): mixed
     {
-        !$merchant_id && $merchant_id = Yii::$app->services->merchant->getId();
+        !$merchant_id && $merchant_id = Yii::$app->services->merchantService->getId();
         $app_id = !$merchant_id ? AppIdEnum::BACKEND : AppIdEnum::MERCHANT;
 
         $info = $this->getConfigInfo($noCache, $app_id, $merchant_id);
@@ -60,7 +67,7 @@ class Utility
      * @param bool $noCache false:Read from cache otherwise false
      * @return string|null
      */
-    public function backendConfig(string $name, bool $noCache = false)
+    public function backendConfig(string $name, bool $noCache = false): ?string
     {
         // 获取缓存信息
         $info = $this->getConfigInfo($noCache, AppIdEnum::BACKEND);
@@ -74,7 +81,7 @@ class Utility
      * @param bool $noCache false:Read from cache otherwise false
      * @return array|mixed
      */
-    public function backendConfigAll(bool $noCache = false)
+    public function backendConfigAll(bool $noCache = false): mixed
     {
         $info = $this->getConfigInfo($noCache, AppIdEnum::BACKEND);
 
@@ -86,12 +93,12 @@ class Utility
      *
      * @param string $name Configuration name
      * @param bool $noCache false:Read from cache otherwise false
-     * @param int $merchant_id Merchant ID
+     * @param ?int $merchant_id Merchant ID
      * @return string|null
      */
-    public function merchantConfig(string $name, $noCache = false, $merchant_id = 0)
+    public function merchantConfig(string $name, bool $noCache = false, ?int $merchant_id = null): ?string
     {
-        !$merchant_id && $merchant_id = Yii::$app->services->merchant->getId();
+        !$merchant_id && $merchant_id = Yii::$app->services->merchantService->getId();
         !$merchant_id && $merchant_id = 1;
         $info = $this->getConfigInfo($noCache, AppIdEnum::MERCHANT, $merchant_id);
 
@@ -102,12 +109,12 @@ class Utility
      * Get current merchant configuration
      *
      * @param bool $noCache false:Read from cache otherwise false
-     * @param int $merchant_id Merchant ID
+     * @param ?int $merchant_id Merchant ID
      * @return array|mixed
      */
-    public function merchantConfigAll(bool $noCache = false, int $merchant_id = 0)
+    public function merchantConfigAll(bool $noCache = false, ?int $merchant_id = null): mixed
     {
-        !$merchant_id && $merchant_id = Yii::$app->services->merchant->getId();
+        !$merchant_id && $merchant_id = Yii::$app->services->merchantService->getId();
         !$merchant_id && $merchant_id = 1;
 
         $info = $this->getConfigInfo($noCache, AppIdEnum::MERCHANT, $merchant_id);
@@ -120,18 +127,18 @@ class Utility
      *
      * @param bool $noCache false:Read from cache otherwise false
      * @param string $app_id AppID from AppIdEnum
-     * @param int $merchant_id Merchant ID
+     * @param ?int $merchant_id Merchant ID
      * @return array|mixed
      */
-    protected function getConfigInfo(bool $noCache, string $app_id, int $merchant_id = 0)
+    protected function getConfigInfo(bool $noCache, string $app_id, ?int $merchant_id = null): mixed
     {
-        $cacheKey = 'config:' . $merchant_id . $app_id;
+        $cacheKey = 'config:' . ($merchant_id ?? '') . $app_id;
         if (!$noCache && !empty($this->config[$cacheKey])) {
             return $this->config[$cacheKey];
         }
 
         if ($noCache || !($this->config[$cacheKey] = Yii::$app->cache->get($cacheKey))) {
-            $config = Yii::$app->services->config->findAllWithValue($app_id, $merchant_id);
+            $config = Yii::$app->services->configService->findAllWithValue($app_id, $merchant_id);
             $this->config[$cacheKey] = [];
 
             foreach ($config as $row) {
@@ -144,39 +151,39 @@ class Utility
         return $this->config[$cacheKey];
     }
 
-    /**
-     * 获取设备客户端信息
-     *
-     * @return mixed|string
-     */
-    public function detectVersion()
-    {
-        /** @var \Detection\MobileDetect $detect */
-        $detect = Yii::$app->mobileDetect;
-        if ($detect->isMobile()) {
-            $devices = $detect->getOperatingSystems();
-            $device = '';
-
-            foreach ($devices as $key => $valaue) {
-                if ($detect->is($key)) {
-                    $device = $key . $detect->version($key);
-                    break;
-                }
-            }
-
-            return $device;
-        }
-
-        return $detect->getUserAgent();
-    }
+//    /**
+//     * 获取设备客户端信息
+//     *
+//     * @return mixed|string
+//     */
+//    public function detectVersion()
+//    {
+//        /** @var \Detection\MobileDetect $detect */
+//        $detect = Yii::$app->mobileDetect;
+//        if ($detect->isMobile()) {
+//            $devices = $detect->getOperatingSystems();
+//            $device = '';
+//
+//            foreach ($devices as $key => $valaue) {
+//                if ($detect->is($key)) {
+//                    $device = $key . $detect->version($key);
+//                    break;
+//                }
+//            }
+//
+//            return $device;
+//        }
+//
+//        return $detect->getUserAgent();
+//    }
 
     /**
      * 解析系统报错
      *
-     * @param \Exception $e
+     * @param Exception $e
      * @return array
      */
-    public function getSysError(\Exception $e)
+    public function getSysError(Exception $e): array
     {
         return [
             'errorMessage' => $e->getMessage(),
@@ -188,42 +195,33 @@ class Utility
     }
 
     /**
-     * 解析微信是否报错
-     *
-     * @param array $message 微信回调数据
-     * @param bool $direct 是否直接报错
+     * Gets wechat error info
+     * @param array $message
+     * @param bool $direct
      * @return bool
      * @throws UnprocessableEntityHttpException
-     * @throws \EasyWeChat\Kernel\Exceptions\HttpException
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
-     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
-     * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    public function getWechatError($message, $direct = true)
+    public function getWechatError(array $message, bool $direct = true): bool
     {
         if (isset($message['errcode']) && $message['errcode'] != 0) {
             if ($message['errcode'] == 40001) {
                 Yii::$app->wechat->app->access_token->getToken(true);
             }
-
             if ($direct) {
                 throw new UnprocessableEntityHttpException($message['errmsg']);
             }
-
             return $message['errmsg'];
         }
-
         return false;
     }
 
     /**
      * 解析错误
      *
-     * @param $fistErrors
-     * @return string
+     * @param array|string $firstErrors
+     * @return bool|string
      */
-    public function analyErr($firstErrors)
+    public function analyErr(array|string $firstErrors): bool|string
     {
         if (!is_array($firstErrors) || empty($firstErrors)) {
             return false;

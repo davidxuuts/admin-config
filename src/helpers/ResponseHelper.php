@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 namespace davidxu\config\helpers;
 
@@ -38,10 +43,10 @@ class ResponseHelper
      *
      * @param int $code Http status code
      * @param string $message Returned message
-     * @param array|object $data Returned data array or object
-     * @return array|mixed
+     * @param object|array $data Returned data array or object
+     * @return array
      */
-    protected static function baseJson(int $code, string $message, $data): array
+    protected static function baseJson(int $code, string $message, object|array $data): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -58,10 +63,10 @@ class ResponseHelper
      *
      * @param int $code Http status code
      * @param string $message Returned message
-     * @param array|object $data Returned data array or object
+     * @param object|array $data Returned data array or object
      * @return array|array[]|mixed|object|object[]|string|string[]
      */
-    protected static function api(int $code, string $message, $data)
+    protected static function api(int $code, string $message, object|array $data): mixed
     {
         Yii::$app->response->setStatusCode($code, $message);
         Yii::$app->response->data = $data ? ArrayHelper::toArray($data) : [];

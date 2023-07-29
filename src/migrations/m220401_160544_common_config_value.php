@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
 
 use yii\db\Migration;
 
@@ -16,13 +21,14 @@ class m220401_160544_common_config_value extends Migration
         $this->createTable($this->tableName, [
             'id' => $this->primaryKey()->comment('ID'),
             'merchant_id' => $this->integer()->null()->defaultValue(0)->comment('Merchant'),
-            'app_id' => $this->string(20)->notNull()->defaultValue('')->comment('App ID'),
-            'config_id' => $this->integer()->notNull()->defaultValue(0)->comment('Config ID'),
+            'app_id' => $this->string(20)->notNull()->comment('App ID'),
+            'config_id' => $this->integer()->notNull()->comment('Config ID'),
             'data' => $this->text()->null()->comment('Config content'),
         ], $tableOptions);
         $this->addCommentOnTable($this->tableName, 'Common Configuration value table');
         
-        $this->createIndex('Idx_ConfigId',$this->tableName,'config_id',0);
+        $this->addForeignKey('FK_ConfigId', $this->tableName,'config_id',
+            '{{%common_config}}', 'id', 'CASCADE', 'CASCADE');
 
         $this->insert($this->tableName, ['id'=>'1','app_id'=>'backend','config_id'=>'6','merchant_id'=>'0','data'=>'']);
         $this->insert($this->tableName, ['id'=>'2','app_id'=>'backend','config_id'=>'1','merchant_id'=>'0','data'=>'© 2016 - 2020 Yii2-AIO All Rights Reserved.']);
@@ -45,7 +51,7 @@ class m220401_160544_common_config_value extends Migration
     public function down()
     {
         $this->execute('SET foreign_key_checks = 0');
-        $this->dropIndex('Idx_ConfigId', $this->tableName);
+        $this->dropForeignKey('FK_ConfigId', $this->tableName);
         $this->dropTable($this->tableName);
         $this->execute('SET foreign_key_checks = 1;');
     }

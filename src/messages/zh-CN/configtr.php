@@ -1,16 +1,26 @@
 <?php
+/*
+ * Copyright (c) 2023.
+ * @author David Xu <david.xu.uts@163.com>
+ * All rights reserved.
+ */
+
 return [
     //Gender
     'Male' => '男',
     'Female' => '女',
     'Unknown' => '未知',
+    'Username' => '用户名',
+    'Real name' => '真实姓名',
 
     //Common
     '{attribute} cannot be blank.' => '{attribute}不能为空',
     'Saved successfully' => '保存成功',
     'Deleted successfully' => '删除成功',
     'Updated successfully' => '更新成功',
+    'Restored successfully' => '恢复成功',
     'Updated failed' => '更新失败',
+    'Save failed' => '保存失败',
     'Data not found' => '资源未找到',
     'Error message not fount' => '未捕获到错误信息',
     'Request error' => '请求错误',
@@ -48,6 +58,7 @@ return [
     'Disable' => '禁用',
     'Enabled' => '已启用',
     'Disabled' => '已禁用',
+    'Deleted' => '已删除',
     'Status' => '状态',
     'Parent ID' => '父类',
     'Delete' => '删除',
@@ -63,4 +74,11 @@ return [
     'Hide remark' => '隐藏备注',
     'Created at' => '创建',
     'Updated at' => '更新',
+    'Create system config param' => '新增配置参数',
+    'Create config category' => '新增配置分类',
+    'Search category title/config title/unique name' => '输入分类标题/配置标题/配置标识来搜索',
+    'Config params management' => '配置参数管理',
+    'Config categories management' => '配置分类管理',
+    'System configuration' => '网站基本配置',
+    'Display on development mode' => '开发模式可见',
 ];
