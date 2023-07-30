@@ -19,6 +19,7 @@ use yii\db\ActiveRecord;
 use yii\db\ActiveRecordInterface;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
+use yii\filters\AccessControl;
 
 /**
  * @property string|ActiveRecordInterface|null $modelClass
@@ -63,22 +64,6 @@ class BaseController extends Controller
                 'modelClass' => $this->modelClass,
             ],
         ], $actions);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function behaviors(): array
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-//                    'delete' => ['POST'],
-//                    'destroy' => ['POST'],
-                ],
-            ],
-        ];
     }
 
     /**
