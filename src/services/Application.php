@@ -29,4 +29,12 @@ class Application extends Service
         'configService' => ConfigService::class,
         'configCateService' => ConfigCateService::class,
     ];
+
+    /**
+     * @return array|string[]
+     */
+    public function getServices(): array
+    {
+        return $this->childService;
+    }
 }

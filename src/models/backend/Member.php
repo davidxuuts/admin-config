@@ -22,7 +22,7 @@ use yii\base\Exception;
  * @property string $password_hash Password
  * @property string $auth_key Authorization key
  * @property string $password_reset_token Password reset token
- * @property int $type Type[1:Admin, 10:Super admin]
+ * @property int $type Type[1:AdminUser, 10:Super admin]
  * @property string $realname Real name
  * @property string $head_portrait Head portrait
  * @property int $gender Gender[0:Unknown;1:Male;2:Female]
